@@ -37,6 +37,7 @@ namespace BinarySearchTree
         public BinarySearchTree()
         {
             Root = null;
+            NodeCount = 0;
         }
 
         public void Insert(int value)
