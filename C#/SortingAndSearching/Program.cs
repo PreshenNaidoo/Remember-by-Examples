@@ -221,7 +221,7 @@ namespace SortingAndSearching
                 return BinarySearch(arr, mid + 1, high, searchValue);
 
             return false;
-        }
+        }        
 
         static void Main(string[] args)
         {

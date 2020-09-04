@@ -103,6 +103,35 @@ namespace Stack
                 Console.Write(Digits.Pop());
         }
 
+        static bool SymbolBalance(string str)
+        {
+            Stack<char> symb = new Stack<char>();
+
+            foreach(char c in str)
+            {
+                if (c == '(' || c == '[' || c == '{')
+                    symb.Push(c);
+                else if (c == ')' || c == ']' || c == '}')
+                {
+                    if (symb.Count() == 0)
+                        return false;
+
+                    char open = symb.Pop();
+                    if (open == '(' && c != ')')
+                        return false;
+                    else if (open == '[' && c != ']')
+                        return false;
+                    else if (open == '{' && c != '}')
+                        return false;
+                }
+            }
+
+            if (symb.Count() > 0)
+                return false;
+
+            return true;
+        }
+
         static void Main(string[] args)
         {
             int a = 0, b = 1, c = 2, d = 3, e = 4;
@@ -119,6 +148,11 @@ namespace Stack
             bool test2 = IsPalindrome("HelloWorld");
 
             MulBase(8, 2);
+
+            bool check1 = SymbolBalance("(a+b)+(c-d)");
+            bool check2 = SymbolBalance("((a+b)+(c-d)");
+            bool check3 = SymbolBalance("((a+b)+[c-d])");
+            bool check4 = SymbolBalance("((a+b)+[c-d]}");
         }
     }
 }

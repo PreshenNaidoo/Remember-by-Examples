@@ -40,6 +40,12 @@ namespace BinarySearchTree
             NodeCount = 0;
         }
 
+        public BinarySearchTree(Node root, int nodeCount)
+        {
+            Root = root;
+            NodeCount = nodeCount;
+        }
+
         public void Insert(int value)
         {
             Node newNode = new Node();
@@ -157,7 +163,7 @@ namespace BinarySearchTree
             while (current != null && current.Data != value)
             {
                 parent = current;
-                if (current.Left != null && value < current.Left.Data)
+                if (current.Left != null && value <= current.Left.Data)
                 {
                     isLeftChild = true;
                     current = current.Left;
@@ -273,6 +279,140 @@ namespace BinarySearchTree
                 GetUniqueNodeCounts(root.Right, arr);
             }
         }
+
+        public bool isBST()
+        {
+            int previousVal = int.MinValue;
+            return isBST(Root, previousVal);
+        }
+
+        private bool isBST(Node root, int previousValue)
+        {
+            if (root == null)
+                return true;
+
+            if (!isBST(root.Left, previousValue))
+                return false;
+
+            if (root.Data < previousValue)
+                return false;
+
+            previousValue = root.Data;
+
+            return isBST(root.Right, previousValue);
+        }
+
+        public Node FindLCA(Node a, Node b)
+        {
+            Node tempRoot = Root;
+            while (true)
+            {
+                if ((a.Data < tempRoot.Data && b.Data > tempRoot.Data) || (a.Data > tempRoot.Data && b.Data < tempRoot.Data))
+                {
+                    return tempRoot;
+                }
+
+                if (a.Data < tempRoot.Data)
+                    tempRoot = tempRoot.Left;
+                else
+                    tempRoot = tempRoot.Right;
+            }
+        }
+
+        /// <summary>
+        /// Build a balanced BST from a sorted array
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static Node BuildBST(int[] arr, int left, int right)
+        {
+            if (left > right)
+                return null;
+
+            Node node = new Node();
+
+            if (left == right)
+            {
+                //leaf node, no children
+                node.Data = arr[left];
+                node.Left = null;
+                node.Right = null;
+            }
+            else
+            {
+                int mid = left + (right - left) / 2;
+                node.Data = arr[mid];
+                node.Left = BuildBST(arr, left, mid - 1);
+                node.Right = BuildBST(arr, mid + 1, right);
+            }
+
+            return node;
+        }
+
+        public void LevelOrder()
+        {
+            if (Root == null)
+                return;
+
+            Queue<Node> queue = new Queue<Node>();
+            queue.Enqueue(Root);
+            while (queue.Count() > 0)
+            {
+                Node curr = queue.Dequeue();
+                Console.WriteLine($"{curr.Data}");
+                if (curr.Left != null)
+                    queue.Enqueue(curr.Left);
+                if (curr.Right != null)
+                    queue.Enqueue(curr.Right);
+            }
+        }
+
+        public int GetHeight()
+        {
+            return height(Root);
+        }
+
+        private int height(Node node)
+        {
+            // Write your code here.
+            int leftHeight = 0;
+            int rightHeight = 0;
+
+            if (node.Left != null)
+                leftHeight = 1 + height(node.Left);
+
+            if (node.Right != null)
+                rightHeight = 1 + height(node.Right);
+
+            return leftHeight > rightHeight ? leftHeight : rightHeight;
+        }
+
+        public int GetLevelOfNode(int data)
+        {
+            return GetLevelOfNode(Root, data, 1); //root a level 1. start at level 1
+        }
+
+        private int GetLevelOfNode(Node node, int data, int level)
+        {
+            if (node == null)
+                return 0;
+
+            Console.WriteLine($"node data {node.Data} @ level {level}");
+
+            if (node.Data == data)
+                return level;
+
+            int downlevel = GetLevelOfNode(node.Left, data, level + 1);
+
+            if (downlevel != 0)
+                return downlevel;
+
+            downlevel = GetLevelOfNode(node.Right, data, level + 1);
+
+            return downlevel;
+        }
     }
 
     class Program
@@ -299,7 +439,7 @@ namespace BinarySearchTree
 
             Node node1 = nums.Find(99);
 
-            nums.Delete(20);
+            //nums.Delete(16);
             Console.WriteLine("Inorder traversal: ");
             nums.InOrder(nums.Root);
 
@@ -314,6 +454,20 @@ namespace BinarySearchTree
             bst.GetUniqueNodeCounts(bst.Root, arr);
             Console.WriteLine($"Node Count: {bst.GetNodeCount()}");
             Console.WriteLine($"Edge Count: {bst.GetEdgeCount()}");
+
+            Node a = new Node(37);
+            Node b = new Node(99);
+            Node c = nums.FindLCA(a, b);
+
+            bool isBST = nums.isBST();
+
+            int[] sortedArr = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            Node root = BinarySearchTree.BuildBST(sortedArr, 0, 8);
+
+            BinarySearchTree bst1 = new BinarySearchTree(root, 9);
+            int height = bst1.GetHeight();
+            bst1.LevelOrder();
+            int level = bst1.GetLevelOfNode(9);
         }
     }
 }
